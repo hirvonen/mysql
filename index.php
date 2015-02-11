@@ -3,7 +3,7 @@ define("TOKEN", "phptestjbf");
 define("AppID", "wxfad891501f5e751d");
 define("EncodingAESKey", "xIb7PhJVeqgQvWaE774mCt7uwQgifSD6v99BAVNhlEH");
 
-require('wxBizMsgCrypt.php');
+require (dirname(__FILE__).'/'.'encrypt/wxBizMsgCrypt.php');
 
 $wechatObj = new wechatCallbackapiTest();
 if (isset($_GET['echostr'])) {
