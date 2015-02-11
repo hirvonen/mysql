@@ -15,7 +15,9 @@ if (isset($_GET['echostr'])) {
 
 class wechatCallback
 {
-	//验证签名
+	/**
+     *验证签名
+     */
     public function valid()
     {
         $echoStr = $_GET["echostr"];
@@ -32,7 +34,7 @@ class wechatCallback
         $tmpArr = array(TOKEN, $timestamp, $nonce);
         sort($tmpArr);
         $tmpStr = implode( $tmpArr );
-        $tmpStr = sha1( $tmpStr ); 
+        $tmpStr = sha1( $tmpStr );
          if( $tmpStr == $signature ){
             return true;
         }else{
@@ -40,7 +42,9 @@ class wechatCallback
         }
     }
 
-	//响应消息
+	/**
+     *响应消息:处理msg的主函数
+     */
     public function responseMsg()
     {
     	/*
@@ -69,14 +73,22 @@ class wechatCallback
         $encrypt_type = (isset($_GET['encrypt_type']) && ($_GET['encrypt_type']=='aes')) ? 'aes':'raw';
 
         $postStr = $GLOBALS['HTTP_RAW_POST_DATA'];
+        $postObj = 0;
+
         if(!empty($postStr)){
         	//解密
 	    	if ($encrypt_type == 'aes'){
 	    		$pc = new WXBizMsgCrypt(TOKEN, EncodingAESKey, AppID);                
 				$this->logger(" D \r\n".$postStr);
-				$decryptMsg = "";  //解密后的明文
+				$decryptMsg = "";  //解密后的明文存储用
 				$errCode = $pc->DecryptMsg($msg_signature, $timestamp, $nonce, $postStr, $decryptMsg);
-				$postStr = $decryptMsg;
+                if($errCode == ErrorCode::$OK) {
+                    $postStr = $decryptMsg;
+                }
+                else{
+                    $this->logger(" R \r\n".$errCode);
+                    return;
+                }
 		    }
 		    $this->logger(" R \r\n".$postStr);
 		    $postObj = simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
@@ -84,14 +96,14 @@ class wechatCallback
         }
 
         //消息类型分离
-        $msghdl = new msgHandle($postObj);
+        $msgHdl = new msgHandle($postObj);
 	    switch ($RX_TYPE)
 	    {
 	        case "event":
-	            $result = $msghdl->receiveEvent();
+	            $result = $msgHdl->receiveEvent();
 	            break;
 	        case "text":
-	            $result = $msghdl->receiveText();
+	            $result = $msgHdl->receiveText();
 	            break;
 	    }
 	    $this->logger(" R \r\n".$result);
