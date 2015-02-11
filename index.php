@@ -1,145 +1,228 @@
-<html>
-<head>
-<title>Connecting MySQL Server</title>
-</head>
-<body>
 <?php
-	$conn = connect_conn();
+define("TOKEN", "phptestjbf");
+define("AppID", "wxfad891501f5e751d");
+define("EncodingAESKey", "xIb7PhJVeqgQvWaE774mCt7uwQgifSD6v99BAVNhlEH");
 
-	$db_name = 'eyoungdb';
-//	$tbl_name = 'ZL_tbl_1';
+require('wxBizMsgCrypt.php');
 
-//	create_db($conn, $db_name);
+$wechatObj = new wechatCallbackapiTest();
+if (isset($_GET['echostr'])) {
+    $wechatObj->valid();
+}else{
+    $wechatObj->responseMsg();
+} 
 
-	select_db($conn, $db_name);
-	show_tbl($conn,'tbl_user');
+class wechatCallbackapiTest
+{
+	//验证签名
+    public function valid()
+    {
+        $echoStr = $_GET["echostr"];
+        if($this->checkSignature()){
+            echo $echoStr;
+            exit;
+        }
+    }
+    private function checkSignature()
+    {
+        $signature = $_GET["signature"];
+        $timestamp = $_GET["timestamp"];
+        $nonce = $_GET["nonce"]; 
+        $tmpArr = array(TOKEN, $timestamp, $nonce);
+        sort($tmpArr);
+        $tmpStr = implode( $tmpArr );
+        $tmpStr = sha1( $tmpStr ); 
+         if( $tmpStr == $signature ){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
-//	create_tbl($conn, $tbl_name);
+	//响应消息
+    public function responseMsg()
+    {
+    	/*
+        $postStr = $GLOBALS["HTTP_RAW_POST_DATA"]; 
+        if (!empty($postStr)){
+            $postObj = simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
+            $msgtype_rcv = trim($postObj->MsgType);
+            switch($msgtype_rcv){
+                case "text":
+                    //$this->handleText($postObj);
+                    break;
+                case "event":
+                    $this->handleEvent($postObj);
+                    break;
+                default:
+                    break;
+            }
+        }else{
+            echo "";
+            exit;
+        }
+        */
+        $timestamp = $_GET['timestamp'];
+        $nonce = $_GET['nonce'];
+        $msg_signature = $_GET['msg_signature'];
+        $encrypt_type = (isset($_GET['encrypt_type']) && ($_GET['encrypt_type']=='aes')) ? 'aes':'raw';
 
-	//$retval = delete_db($conn, $db_name);
+        $postStr = $GLOBALS['HTTP_RAW_POST_DATA'];
+        if(!empty($postStr)){
+        	//解密
+	    	if ($encrypt_type == 'aes'){
+	    		$pc = new WXBizMsgCrypt(TOKEN, EncodingAESKey, AppID);                
+				$this->logger(" D \r\n".$postStr);
+				$decryptMsg = "";  //解密后的明文
+				$errCode = $pc->DecryptMsg($msg_signature, $timestamp, $nonce, $postStr, $decryptMsg);
+				$postStr = $decryptMsg;
+		    }
+		    $this->logger(" R \r\n".$postStr);
+		    $postObj = simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
+		    $RX_TYPE = trim($postObj->MsgType);
+        }
 
-	close_conn($conn);
+        //消息类型分离
+	    switch ($RX_TYPE)
+	    {
+	        case "event":
+	            $result = $this->receiveEvent($postObj);
+	            break;
+	        case "text":
+	            $result = $this->receiveText($postObj);
+	            break;
+	    }
+	    $this->logger(" R \r\n".$result);
+	    //加密
+	    if ($encrypt_type == 'aes'){
+	        $encryptMsg = ''; //加密后的密文
+	        $errCode = $pc->encryptMsg($result, $timeStamp, $nonce, $encryptMsg);
+	        $result = $encryptMsg;
+	        $this->logger(" E \r\n".$result);
+	    }
+        echo $result;
+    }
 
-//=================================================================================================================
-	function connect_conn(){
-		//$dbhost = 'localhost:3306';
-		//$dbuser = 'root';
-		//$dbpass = 'root';
-		$dbhost = '121.41.104.220';
-		$dbuser = 'root';
-		$dbpass = 'Cccc1111';
-		$conn = mysql_connect($dbhost, $dbuser, $dbpass);
-		if(! $conn ){
-			die('Could not connect: ' . mysql_error());
-		}
-		else{
-			echo 'Connected successfully<br>';
-		}
-		return $conn;
-	}
-	
-	function create_db( $conn, $db_name ){
-		$sql = 'CREATE DATABASE '.$db_name;
-		$retval = mysql_query($sql, $conn);
-		if(!$retval){
-			if( mysql_errno() != 1007 ){
-				die('Could not create database:' .mysql_error().mysql_errno().'<br>');
-			}
-			else{
-				echo "Database ".$db_name." already exist<br>";
-			}
-		}
-		else{
-			echo "Database ".$db_name." created successfully<br>";
-		}
-		return $retval;
-	}
+    //Common Funcs
+    private function getTpl($postObj)
+    {
+        $msgType = trim($postObj->MsgType);
+        switch ($msgType) {
+            case 'text':
+                $replyTpl = "<xml>
+                            <ToUserName><![CDATA[%s]]></ToUserName>
+                            <FromUserName><![CDATA[%s]]></FromUserName>
+                            <CreateTime>%s</CreateTime>
+                            <MsgType><![CDATA[%s]]></MsgType>
+                            <Content><![CDATA[%s]]></Content>
+                            <FuncFlag>0</FuncFlag>
+                            </xml>";
+                break;
+            case 'event':
+                $replyTpl = "<xml>
+                            <ToUserName><![CDATA[%s]]></ToUserName>
+                            <FromUserName><![CDATA[%s]]></FromUserName>
+                            <CreateTime>%s</CreateTime>
+                            <MsgType><![CDATA[%s]]></MsgType>
+                            <Content><![CDATA[%s]]></Content>
+                            <FuncFlag>0</FuncFlag>
+                            </xml>";
+                break;
+            default:
+                break;
+        }
+        return $replyTpl;
+    }
 
-	function select_db( $conn, $db_name ){
-		$retval = mysql_select_db( $db_name );
-		if(!$retval){
-			die('Could not select database:' .mysql_error().mysql_errno().'<br>');
-		}
-		else{
-			echo "Database ".$db_name." selected successfully<br>";
-		}
-	}
+    //Text Handle Funcs
+    private function handleText($postObj)
+    {
+        $fromUsername = $postObj->FromUserName;
+        $toUsername = $postObj->ToUserName;
+        $time = time();
+        $textTpl = $this->getTpl($postObj);
+        $contentStr = $this->getReplyText($postObj);
+        $resultStr = sprintf($textTpl, $fromUsername, $toUsername, $time, "text", $contentStr);
+        echo $resultStr;
+    }
+    private function getReplyText($postObj)
+    {
+        $keyword = trim($postObj->Content);
+        if($keyword == "women"){
+            $contentStr = "E-young【产后上门护理】\n".'<a href="http://sekikou.oicp.net:48446/wordpress/"> 我们的站点</a>';
+        }else{
+            $contentStr = "test OK: ".$keyword;
+        }
+        return $contentStr;
+    }
 
-	function create_tbl( $conn, $tbl_name){
-		$sql = "CREATE TABLE ".$tbl_name." ( ".
-				"ZL_id INT NOT NULL AUTO_INCREMENT, ".
-				"ZL_title VARCHAR(100) NOT NULL, ".
-				"ZL_author VARCHAR(40) NOT NULL, ".
-				"submission_data DATE, ".
-				"PRIMARY KEY( ZL_id )".
-				");";
-		$retval = mysql_query($sql, $conn);
-		if(!$retval){
-			if( mysql_errno() != 1050 ){
-				die('Could not create table: '.mysql_error().mysql_errno());
-			}
-			else{
-				echo "Table ".$tbl_name." already exist<br>";
-			}
-		}
-		else{
-			echo 'Table '.$tbl_name.' created successfully<br>';
-		}
-		return $retval;
-	}
+    //Event Handle Funcs
+    private function handleEvent($postObj)
+    {
+        $event = trim($postObj->Event);
+        switch ($event) {
+            case 'CLICK':
+                $this->handleEvent_Click($postObj);
+                break;
+            case 'subscribe':
+            //$this->handleEvent_Subscribe($postObj);
+	            break;
+            default:
+                # code...
+                break;
+        }
+    }
+    private function handleEvent_Click($postObj)
+    {
+        $eventKey = trim($postObj->EventKey);
+        switch ($eventKey) {
+            case 'myOrder'://我的订单
+                //connect to db
+                $dbhost = '121.41.104.220';
+                $dbuser = 'root';
+                $dbpass = 'Cccc1111';
+	            $db_name = 'eyoungdb';
+                $conn = mysql_connect($dbhost, $dbuser, $dbpass);
+                $retval = mysql_select_db( $db_name );
+                $sql = "SHOW TABLES FROM eyoungdb ";
+                $retval = mysql_query($sql, $conn);
+            	
+           		while($row = mysql_fetch_row($retval)){
+          	          //echo "<tr><td>$row[0]</td></tr>";
+                    $strtemp = $strtemp."$row[0]"."\n";
+          		}
+            //    $row = mysql_fetch_row($retval);
 
-	function show_tbl( $conn, $tbl_name){
-		$sql = "SHOW TABLES FROM eyoungdb ";
-		//$sql  = "SHOW FULL COLUMNS FROM tbl_user ";
-		//$sql = "SHOW COLUMNS FROM tbl_user";
-		$retval = mysql_query($sql, $conn);
-		if(!$retval){
-			die('Could not select table: '.mysql_error().mysql_errno());
-		}
-		else{
-			echo '<table>';
-			while($row = mysql_fetch_row($retval)){
-				echo "<tr><td>$row[0]</td></tr>";
-				//print_r($row);
-			}
-			echo '</table>';
-		}
-		return $retval;
-	}
-
-	function select_tbl( $conn, $tbl_name){
-		$sql = "SELECT * FROM ".$tbl_name;
-		$retval = mysql_query($sql, $conn);
-		if(!$retval){
-			die('Could not select table: '.mysql_error().mysql_errno());
-		}
-		else{
-			echo '<table>';
-			echo '<tr><td>userid</td><td>username</td><td>password</td></tr>';
-			while($row=mysql_fetch_row($retval))
-				echo '<tr><td>$row[1]</td><td>$row[2]</td><td>$row[3]</td></tr>';
-			echo '</table>';
-		}
-		return $retval;
-	}
-
-	function delete_db( $conn, $db_name){
-		$sql = 'DROP DATABASE ZL';
-		$retval = mysql_query($sql, $conn);
-		if(!$retval){
-			die('Could not delete database:' .mysql_error());
-		}
-		echo "Database ".$db_name." deleted successfully<br>";
-		return $retval;
-	}
-
-	function close_conn($conn){
-		$retval = mysql_close($conn);
-		if(! $retval ){
-			die('Could not close connection ' . mysql_error());
-		}
-		echo 'Connect closed successfully<br>';
-	}
+                $fromUsername = $postObj->FromUserName;
+                $toUsername = $postObj->ToUserName;
+                $time = time();
+                $textTpl = $this->getTpl($postObj);
+                $contentStr = $strtemp;
+                $resultStr = sprintf($textTpl, $fromUsername, $toUsername, $time, "text", $contentStr);
+                echo $resultStr;
+                break;
+            case 'myInfo':
+            	$fromUsername = $postObj->FromUserName;
+                $toUsername = $postObj->ToUserName;
+                $time = time();
+                $textTpl = $this->getTpl($postObj);
+                $contentStr = "myINFO";
+                $resultStr = sprintf($textTpl, $fromUsername, $toUsername, $time, "text", $contentStr);
+                echo $resultStr;
+                break;
+            case 'memberCharge':
+            	$fromUsername = $postObj->FromUserName;
+                $toUsername = $postObj->ToUserName;
+                $time = time();
+                $textTpl = $this->getTpl($postObj);
+                $contentStr = "myINFO";
+                $resultStr = sprintf($textTpl, $fromUsername, $toUsername, $time, "text", $contentStr);
+                echo $resultStr;
+                break;
+            default:
+                # code...
+                break;
+        }
+    }
+}
 ?>
-</body>
-</html>
