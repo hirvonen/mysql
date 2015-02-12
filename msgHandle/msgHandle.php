@@ -52,6 +52,7 @@ class msgHandle
                 $sql = "SHOW TABLES FROM eyoungdb ";
                 $retval = mysql_query($sql, $conn);
 
+                $strtemp = '';
                 while($row = mysql_fetch_row($retval)){
                     //echo "<tr><td>$row[0]</td></tr>";
                     $strtemp = $strtemp."$row[0]"."\n";
@@ -71,7 +72,7 @@ class msgHandle
                 $toUsername = $this->postObj->ToUserName;
                 $time = time();
                 $textTpl = $this->getTpl($this->postObj);
-                $contentStr = "myINFO";
+                $contentStr = "我的信息";
                 $resultStr = sprintf($textTpl, $fromUsername, $toUsername, $time, "text", $contentStr);
                 echo $resultStr;
                 break;
@@ -80,7 +81,7 @@ class msgHandle
                 $toUsername = $this->postObj->ToUserName;
                 $time = time();
                 $textTpl = $this->getTpl($this->postObj);
-                $contentStr = "myINFO";
+                $contentStr = "会员充值";
                 $resultStr = sprintf($textTpl, $fromUsername, $toUsername, $time, "text", $contentStr);
                 echo $resultStr;
                 break;

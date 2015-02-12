@@ -73,51 +73,54 @@ class wechatCallback
         $encrypt_type = (isset($_GET['encrypt_type']) && ($_GET['encrypt_type']=='aes')) ? 'aes':'raw';
 
         $postStr = $GLOBALS['HTTP_RAW_POST_DATA'];
-        $postObj = 0;
+        $pc = new WXBizMsgCrypt(TOKEN, EncodingAESKey, AppID);
 
         if(!empty($postStr)){
         	//解密
 	    	if ($encrypt_type == 'aes'){
-	    		$pc = new WXBizMsgCrypt(TOKEN, EncodingAESKey, AppID);                
-				$this->logger(" D \r\n".$postStr);
+				//$this->logger(" D \r\n".$postStr);
 				$decryptMsg = "";  //解密后的明文存储用
 				$errCode = $pc->DecryptMsg($msg_signature, $timestamp, $nonce, $postStr, $decryptMsg);
                 if($errCode == ErrorCode::$OK) {
                     $postStr = $decryptMsg;
                 }
                 else{
-                    $this->logger(" R \r\n".$errCode);
+                    //$this->logger(" R \r\n".$errCode);
                     return;
                 }
 		    }
-		    $this->logger(" R \r\n".$postStr);
+		    //$this->logger(" R \r\n".$postStr);
 		    $postObj = simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
 		    $RX_TYPE = trim($postObj->MsgType);
-        }
 
-        //消息类型分离
-        $msgHdl = new msgHandle($postObj);
-	    switch ($RX_TYPE)
-	    {
-	        case "event":
-	            $result = $msgHdl->receiveEvent();
-	            break;
-	        case "text":
-	            $result = $msgHdl->receiveText();
-	            break;
-	    }
-	    $this->logger(" R \r\n".$result);
-	    //加密
-	    if ($encrypt_type == 'aes'){
-	        $encryptMsg = ''; //加密后的密文
-	        $errCode = $pc->encryptMsg($result, $timeStamp, $nonce, $encryptMsg);
-	        $result = $encryptMsg;
-	        $this->logger(" E \r\n".$result);
-	    }
-        echo $result;
+            //消息类型分离
+            $msgHdl = new msgHandle($postObj);
+            $result = 0;
+            switch ($RX_TYPE)
+            {
+                case "event":
+                    $result = $msgHdl->receiveEvent();
+                    break;
+                case "text":
+                    $result = $msgHdl->receiveText();
+                    break;
+                default:
+                    break;
+            }
+            //$this->logger(" R \r\n".$result);
+            //加密
+            if ($encrypt_type == 'aes'){
+                $encryptMsg = ''; //加密后的密文
+                $pc->encryptMsg($result, $timestamp, $nonce, $encryptMsg);
+                $result = $encryptMsg;
+                //$this->logger(" E \r\n".$result);
+            }
+            //echo $result;
+        }
     }
 
     //日志记录
+    /*
 	public function logger($log_content)
 	{
 	    if(isset($_SERVER['HTTP_APPNAME'])){   //SAE
@@ -131,5 +134,6 @@ class wechatCallback
 	        file_put_contents($log_filename, date('Y-m-d H:i:s').$log_content."\r\n", FILE_APPEND);
 	    }
 	}
+    */
 }
 ?>
