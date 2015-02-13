@@ -78,7 +78,7 @@ class wechatCallback
         if(!empty($postStr)){
         	//解密
 	    	if ($encrypt_type == 'aes'){
-				//$this->logger(" D \r\n".$postStr);
+				$this->logger(" D \r\n".$postStr);
 				$decryptMsg = "";  //解密后的明文存储用
 				$errCode = $pc->DecryptMsg($msg_signature, $timestamp, $nonce, $postStr, $decryptMsg);
                 if($errCode == ErrorCode::$OK) {
@@ -120,13 +120,12 @@ class wechatCallback
     }
 
     //日志记录
-    /*
-	public function logger($log_content)
+    public function logger($log_content)
 	{
 	    if(isset($_SERVER['HTTP_APPNAME'])){   //SAE
-	        sae_set_display_errors(false);
+            $this->set_display_errors(false);
 	        sae_debug($log_content);
-	        sae_set_display_errors(true);
+            $this->set_display_errors(true);
 	    }else if($_SERVER['REMOTE_ADDR'] != "127.0.0.1"){ //LOCAL
 	        $max_size = 500000;
 	        $log_filename = "log.xml";
@@ -134,6 +133,14 @@ class wechatCallback
 	        file_put_contents($log_filename, date('Y-m-d H:i:s').$log_content."\r\n", FILE_APPEND);
 	    }
 	}
-    */
+    private function set_display_errors($displayErrors)
+    {
+        if($displayErrors == true) {
+            ini_set('display_errors', 1);
+        }
+        else{
+            ini_set('display_errors', 0);
+        }
+    }
 }
 ?>

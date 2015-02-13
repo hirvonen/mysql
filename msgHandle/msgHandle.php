@@ -26,7 +26,7 @@ class msgHandle
                 $this->receiveEvent_Click();
                 break;
             case 'subscribe':   //用户关注事件处理
-                //$this->handleEvent_Subscribe($this->postObj);
+                $this->receiveEvent_Subscribe();
                 break;
             default:
                 break;
@@ -89,6 +89,22 @@ class msgHandle
                 # code...
                 break;
         }
+    }
+
+    /**
+     * 关注事件处理函数
+     * @return int
+     */
+    private function receiveEvent_Subscribe()
+    {
+        $fromUsername = $this->postObj->FromUserName;
+        $toUsername = $this->postObj->ToUserName;
+        $time = time();
+        $textTpl = $this->getTpl($this->postObj);
+        $contentStr = "欢迎关注Eyoung！我们将为您提供最完美的上门服务！";
+        $resultStr = sprintf($textTpl, $fromUsername, $toUsername, $time, "text", $contentStr);
+        echo $resultStr;
+        return ErrorCode_Handle::$OK;
     }
 
 	/**
