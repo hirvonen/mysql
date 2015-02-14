@@ -81,13 +81,13 @@ class msgHandle
                 }
                 //    $row = mysql_fetch_row($retval);
                 $contentStr = $strtemp;*/
-                $contentStr = "对不起，您还没有注册，无法查看订单，请先注册。";
+                $contentStr = "暂时无法查看订单，程序员玩儿命施工中，敬请期待。";
                 break;
             case 'myInfo'://我的信息
-                $contentStr = "对不起，您还没有注册，无法查看信息，请先注册。";
+                $contentStr = "暂时无法查看信息，程序员玩儿命施工中，敬请期待。";
                 break;
             case 'memberCharge'://会员充值
-                $contentStr = "对不起，您还没有注册，无法充值，请先注册。";
+                $contentStr = "暂时无法充值，程序员玩儿命施工中，敬请期待。";
                 break;
             default:
                 $contentStr = "哎呦出错啦！请联系我们！021-XXXXXXXX";
@@ -174,7 +174,7 @@ class msgHandle
         if($keyword == "women"){
             $contentStr = "E-young【产后恢复美疗】\n".'<a href="http://121.41.104.220/e-young/"> 我们的站点</a>';
         }else{
-            $contentStr = "test OK: ".$keyword;
+            $contentStr = "程序员玩儿命施工中，敬请期待。 ".$keyword;
         }
         return $contentStr;
     }

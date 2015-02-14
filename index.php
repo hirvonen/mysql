@@ -11,11 +11,11 @@ if (isset($_GET['echostr'])) {
     $wechatObj->valid();
 }else{
     $wechatObj->responseMsg();
-} 
+}
 
 class wechatCallback
 {
-	/**
+    /**
      *验证签名
      */
     public function valid()
@@ -30,19 +30,19 @@ class wechatCallback
     {
         $signature = $_GET["signature"];
         $timestamp = $_GET["timestamp"];
-        $nonce = $_GET["nonce"]; 
+        $nonce = $_GET["nonce"];
         $tmpArr = array(TOKEN, $timestamp, $nonce);
         sort($tmpArr);
         $tmpStr = implode( $tmpArr );
         $tmpStr = sha1( $tmpStr );
-         if( $tmpStr == $signature ){
+        if( $tmpStr == $signature ){
             return true;
         }else{
             return false;
         }
     }
 
-	/**
+    /**
      *响应消息:处理msg的主函数
      */
     public function responseMsg()
@@ -56,11 +56,11 @@ class wechatCallback
         $pc = new WXBizMsgCrypt(TOKEN, EncodingAESKey, AppID);
 
         if(!empty($postStr)){
-        	//解密
-	    	if ($encrypt_type == 'aes'){
-				$this->logger(" D \r\n".$postStr);
-				$decryptMsg = "";  //解密后的明文存储用
-				$errCode = $pc->DecryptMsg($msg_signature, $timestamp, $nonce, $postStr, $decryptMsg);
+            //解密
+            if ($encrypt_type == 'aes'){
+                $this->logger(" D \r\n".$postStr);
+                $decryptMsg = "";  //解密后的明文存储用
+                $errCode = $pc->DecryptMsg($msg_signature, $timestamp, $nonce, $postStr, $decryptMsg);
                 if($errCode == ErrorCode::$OK) {
                     $postStr = $decryptMsg;
                 }
@@ -68,10 +68,10 @@ class wechatCallback
                     $this->logger(" R \r\n".$errCode);
                     return;
                 }
-		    }
-		    $this->logger(" R \r\n".$postStr);
-		    $postObj = simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
-		    $RX_TYPE = trim($postObj->MsgType);
+            }
+            $this->logger(" R \r\n".$postStr);
+            $postObj = simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
+            $RX_TYPE = trim($postObj->MsgType);
 
             //消息类型分离
             $msgHdl = new msgHandle($postObj);
@@ -102,18 +102,18 @@ class wechatCallback
 
     //日志记录
     public function logger($log_content)
-	{
-	    if(isset($_SERVER['HTTP_APPNAME'])){   //SAE
+    {
+        if(isset($_SERVER['HTTP_APPNAME'])){   //SAE
             $this->set_display_errors(false);
-	        sae_debug($log_content);
+            sae_debug($log_content);
             $this->set_display_errors(true);
-	    }else if($_SERVER['REMOTE_ADDR'] != "127.0.0.1"){ //LOCAL
-	        $max_size = 500000;
-	        $log_filename = "log.xml";
-	        if(file_exists($log_filename) and (abs(filesize($log_filename)) > $max_size)){unlink($log_filename);}
-	        file_put_contents($log_filename, date('Y-m-d H:i:s').$log_content."\r\n", FILE_APPEND);
-	    }
-	}
+        }else if($_SERVER['REMOTE_ADDR'] != "127.0.0.1"){ //LOCAL
+            $max_size = 500000;
+            $log_filename = "log.xml";
+            if(file_exists($log_filename) and (abs(filesize($log_filename)) > $max_size)){unlink($log_filename);}
+            file_put_contents($log_filename, date('Y-m-d H:i:s').$log_content."\r\n", FILE_APPEND);
+        }
+    }
     private function set_display_errors($displayErrors)
     {
         if($displayErrors == true) {
