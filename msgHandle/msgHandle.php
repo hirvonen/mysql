@@ -1,56 +1,78 @@
 <?php
+define("DBHOST", "121.41.104.220");
+define("DBUSER", "root");
+define("DBPASS", "Cccc1111");
+define("DBNAME", "eyoungdb");
 
 class msgHandle
 {
     private $postObj;
+    private $db_conn;
+    private $send_fromUsername;
+    private $send_toUsername;
+    private $send_time;
+    private $send_textTpl;
 
-	/**
+    /**
      * 构造函数
      * @param $postObj
      */
     public function msgHandle($postObj)
     {
         $this->postObj = $postObj;
+        $this->send_fromUsername = $this->postObj->ToUserName;
+        $this->send_toUsername = $this->postObj->FromUserName;
+        $this->send_time = time();
+        $this->send_textTpl = $this->getTpl($this->postObj);
     }
 
-
-	/**
+    /**
      * Event受信处理函数
-	 * @return int
+     * @return int
      */
     public function receiveEvent()
     {
         $event = trim($this->postObj->Event);
+
         switch ($event) {
             case 'CLICK':   //点击按钮事件处理
-                $this->receiveEvent_Click();
+                $result = $this->receiveEvent_Click();
                 break;
             case 'subscribe':   //用户关注事件处理
-                $this->receiveEvent_Subscribe();
+                $result = $this->receiveEvent_Subscribe();
                 break;
             default:
+                $result = '';
                 break;
         }
-        return ErrorCode_Handle::$OK;
+        return $result;
     }
 
-	/**
+    /**
+     * Text受信处理函数
+     * @return int
+     */
+    public function receiveText()
+    {
+        $contentStr = $this->getReplyText($this->postObj);
+        $result = $this->sentText($contentStr);
+        return $result;
+    }
+
+
+    //内部函数
+    /**
      * 点击按钮事件处理函数
      */
     private function receiveEvent_Click()
     {
+        $this->connectDB();
+        $this->selectDB();
         $eventKey = trim($this->postObj->EventKey);
         switch ($eventKey) {
             case 'myOrder'://我的订单
-                //connect to db
-                $dbhost = '121.41.104.220';
-                $dbuser = 'root';
-                $dbpass = 'Cccc1111';
-                $db_name = 'eyoungdb';
-                $conn = mysql_connect($dbhost, $dbuser, $dbpass);
-                $retval = mysql_select_db( $db_name );
-                $sql = "SHOW TABLES FROM eyoungdb ";
-                $retval = mysql_query($sql, $conn);
+                /*$sql = "SHOW TABLES FROM eyoungdb ";
+                $retval = mysql_query($sql, $this->db_conn);
 
                 $strtemp = '';
                 while($row = mysql_fetch_row($retval)){
@@ -58,37 +80,22 @@ class msgHandle
                     $strtemp = $strtemp."$row[0]"."\n";
                 }
                 //    $row = mysql_fetch_row($retval);
-
-                $fromUsername = $this->postObj->FromUserName;
-                $toUsername = $this->postObj->ToUserName;
-                $time = time();
-                $textTpl = $this->getTpl($this->postObj);
-                $contentStr = $strtemp;
-                $resultStr = sprintf($textTpl, $fromUsername, $toUsername, $time, "text", $contentStr);
-                echo $resultStr;
+                $contentStr = $strtemp;*/
+                $contentStr = "对不起，您还没有注册，无法查看订单，请先注册。";
                 break;
-            case 'myInfo':
-                $fromUsername = $this->postObj->FromUserName;
-                $toUsername = $this->postObj->ToUserName;
-                $time = time();
-                $textTpl = $this->getTpl($this->postObj);
-                $contentStr = "我的信息";
-                $resultStr = sprintf($textTpl, $fromUsername, $toUsername, $time, "text", $contentStr);
-                echo $resultStr;
+            case 'myInfo'://我的信息
+                $contentStr = "对不起，您还没有注册，无法查看信息，请先注册。";
                 break;
-            case 'memberCharge':
-                $fromUsername = $this->postObj->FromUserName;
-                $toUsername = $this->postObj->ToUserName;
-                $time = time();
-                $textTpl = $this->getTpl($this->postObj);
-                $contentStr = "会员充值";
-                $resultStr = sprintf($textTpl, $fromUsername, $toUsername, $time, "text", $contentStr);
-                echo $resultStr;
+            case 'memberCharge'://会员充值
+                $contentStr = "对不起，您还没有注册，无法充值，请先注册。";
                 break;
             default:
-                # code...
+                $contentStr = "哎呦出错啦！请联系我们！021-XXXXXXXX";
                 break;
         }
+        $result = $this->sentText($contentStr);
+        $this->disconnectDB();
+        return $result;
     }
 
     /**
@@ -97,35 +104,30 @@ class msgHandle
      */
     private function receiveEvent_Subscribe()
     {
-        $fromUsername = $this->postObj->FromUserName;
-        $toUsername = $this->postObj->ToUserName;
-        $time = time();
-        $textTpl = $this->getTpl($this->postObj);
-        $contentStr = "欢迎关注Eyoung！我们将为您提供最完美的上门服务！";
-        $resultStr = sprintf($textTpl, $fromUsername, $toUsername, $time, "text", $contentStr);
-        echo $resultStr;
-        return ErrorCode_Handle::$OK;
+        $contentStr = "欢迎关注Eyoung！我们将为您提供最完美的产后恢复上门美疗服务！";
+        //$resultStr = sprintf($textTpl, $fromUsername, $toUsername, $time, "text", $contentStr);
+        $result = $this->sentText($contentStr);
+        return $result;
     }
 
-	/**
-     * Text受信处理函数
-     * @return int
-     */
-    public function receiveText()
+    private function connectDB()
     {
-        $fromUsername = $this->postObj->FromUserName;
-        $toUsername = $this->postObj->ToUserName;
-        $time = time();
-        $textTpl = $this->getTpl($this->postObj);
-        $contentStr = $this->getReplyText($this->postObj);
-        $resultStr = sprintf($textTpl, $fromUsername, $toUsername, $time, "text", $contentStr);
-        echo $resultStr;
-        return ErrorCode_Handle::$OK;
+        $this->db_conn = mysql_connect(DBHOST, DBUSER, DBPASS);
     }
 
+    private function disconnectDB()
+    {
+        mysql_close($this->db_conn);
+    }
 
-    //Common Funcs
-    private function getTpl($postObj)
+    private function selectDB()
+    {
+        if( $this->db_conn ) {
+            mysql_select_db( DBNAME );
+        }
+    }
+
+    private function getTpl()
     {
         $msgType = trim($this->postObj->MsgType);
         switch ($msgType) {
@@ -155,11 +157,22 @@ class msgHandle
         return $replyTpl;
     }
 
+    private function sentText($contentStr)
+    {
+        $resultStr = sprintf($this->send_textTpl,
+            $this->send_toUsername,
+            $this->send_fromUsername,
+            $this->send_time,
+            "text",
+            $contentStr);
+        return $resultStr;
+    }
+
     private function getReplyText()
     {
         $keyword = trim($this->postObj->Content);
         if($keyword == "women"){
-            $contentStr = "E-young【产后上门护理】\n".'<a href="http://sekikou.oicp.net:48446/wordpress/"> 我们的站点</a>';
+            $contentStr = "E-young【产后恢复美疗】\n".'<a href="http://121.41.104.220/e-young/"> 我们的站点</a>';
         }else{
             $contentStr = "test OK: ".$keyword;
         }

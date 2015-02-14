@@ -45,8 +45,18 @@
       <file leaf-file-name="msgHandle.php" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/msgHandle/msgHandle.php">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< Updated upstream
             <state vertical-scroll-proportion="0.3437967" vertical-offset="510" max-vertical-offset="2440">
               <caret line="37" column="17" selection-start-line="37" selection-start-column="17" selection-end-line="37" selection-end-column="17" />
+=======
+<<<<<<< Updated upstream
+            <state vertical-scroll-proportion="1.0463378" vertical-offset="1140" max-vertical-offset="3160">
+              <caret line="92" column="0" selection-start-line="92" selection-start-column="0" selection-end-line="92" selection-end-column="0" />
+=======
+            <state vertical-scroll-proportion="1.1921965" vertical-offset="0" max-vertical-offset="1170">
+              <caret line="106" column="5" selection-start-line="106" selection-start-column="5" selection-end-line="106" selection-end-column="5" />
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
               <folding>
                 <element signature="n#receiveEvent_Click#0;n#msgHandle#0;n#!!top" expanded="false" />
                 <marker date="1423831823812" expanded="true" signature="4114:4520" placeholder="..." />
@@ -56,6 +66,39 @@
           </provider>
         </entry>
       </file>
+<<<<<<< Updated upstream
+=======
+      <file leaf-file-name="wxBizMsgCrypt.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/encrypt/wxBizMsgCrypt.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-14.25" vertical-offset="468" max-vertical-offset="2280">
+              <caret line="58" column="24" selection-start-line="58" selection-start-column="24" selection-end-line="58" selection-end-column="24" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="errorCode.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/encrypt/errorCode.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-8.75" vertical-offset="0" max-vertical-offset="600">
+              <caret line="14" column="33" selection-start-line="14" selection-start-column="33" selection-end-line="14" selection-end-column="33" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="errorCode_handle.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/msgHandle/errorCode_handle.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-3.125" vertical-offset="0" max-vertical-offset="300">
+              <caret line="5" column="12" selection-start-line="5" selection-start-column="12" selection-end-line="5" selection-end-column="12" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+>>>>>>> Stashed changes
     </leaf>
   </component>
   <component name="FindManager">
@@ -354,6 +397,7 @@
         </state>
       </provider>
     </entry>
+<<<<<<< Updated upstream
     <entry file="file://$PROJECT_DIR$/msgHandle/errorCode_handle.php">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="100" max-vertical-offset="400">
@@ -362,6 +406,8 @@
         </state>
       </provider>
     </entry>
+=======
+>>>>>>> Stashed changes
     <entry file="file://$PROJECT_DIR$/index.php">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="1292" max-vertical-offset="2057">
@@ -372,6 +418,7 @@
         </state>
       </provider>
     </entry>
+<<<<<<< Updated upstream
     <entry file="file://$PROJECT_DIR$/msgHandle/msgHandle.php">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="935" max-vertical-offset="1326">
@@ -384,6 +431,8 @@
         </state>
       </provider>
     </entry>
+=======
+>>>>>>> Stashed changes
     <entry file="file://$PROJECT_DIR$/encrypt/wxBizMsgCrypt.php">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="918" max-vertical-offset="2584">
@@ -393,20 +442,30 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/encrypt/errorCode.php">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< Updated upstream
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="680">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+=======
+        <state vertical-scroll-proportion="-8.75" vertical-offset="0" max-vertical-offset="600">
+          <caret line="14" column="33" selection-start-line="14" selection-start-column="33" selection-end-line="14" selection-end-column="33" />
+>>>>>>> Stashed changes
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/msgHandle/errorCode_handle.php">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< Updated upstream
         <state vertical-scroll-proportion="0.0" vertical-offset="85" max-vertical-offset="340">
+=======
+        <state vertical-scroll-proportion="-3.125" vertical-offset="0" max-vertical-offset="300">
+>>>>>>> Stashed changes
           <caret line="5" column="12" selection-start-line="5" selection-start-column="12" selection-end-line="5" selection-end-column="12" />
           <folding />
         </state>
       </provider>
     </entry>
+<<<<<<< Updated upstream
     <entry file="file://$PROJECT_DIR$/encrypt/pkcs7Encoder.php">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.34332085" vertical-offset="805" max-vertical-offset="2580">
@@ -452,9 +511,25 @@
         <state vertical-scroll-proportion="0.3437967" vertical-offset="510" max-vertical-offset="2440">
           <caret line="37" column="17" selection-start-line="37" selection-start-column="17" selection-end-line="37" selection-end-column="17" />
           <folding>
+<<<<<<< Updated upstream
             <element signature="n#receiveEvent_Click#0;n#msgHandle#0;n#!!top" expanded="false" />
             <marker date="1423831823812" expanded="true" signature="4114:4520" placeholder="..." />
             <marker date="1423831823812" expanded="true" signature="4606:5012" placeholder="..." />
+=======
+            <marker date="1423736790689" expanded="true" signature="3629:4035" placeholder="..." />
+            <marker date="1423736790689" expanded="true" signature="4121:4527" placeholder="..." />
+=======
+    <entry file="file://$PROJECT_DIR$/msgHandle/msgHandle.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="1.1921965" vertical-offset="0" max-vertical-offset="1170">
+          <caret line="106" column="5" selection-start-line="106" selection-start-column="5" selection-end-line="106" selection-end-column="5" />
+          <folding>
+            <element signature="n#receiveEvent_Click#0;n#msgHandle#0;n#!!top" expanded="false" />
+            <element signature="n#getTpl#0;n#msgHandle#0;n#!!top" expanded="false" />
+            <marker date="1423675320000" expanded="true" signature="3602:4008" placeholder="..." />
+            <marker date="1423675320000" expanded="true" signature="4094:4500" placeholder="..." />
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
           </folding>
         </state>
       </provider>

@@ -47,26 +47,6 @@ class wechatCallback
      */
     public function responseMsg()
     {
-    	/*
-        $postStr = $GLOBALS["HTTP_RAW_POST_DATA"]; 
-        if (!empty($postStr)){
-            $postObj = simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
-            $msgtype_rcv = trim($postObj->MsgType);
-            switch($msgtype_rcv){
-                case "text":
-                    //$this->handleText($postObj);
-                    break;
-                case "event":
-                    $this->handleEvent($postObj);
-                    break;
-                default:
-                    break;
-            }
-        }else{
-            echo "";
-            exit;
-        }
-        */
         $timestamp = $_GET['timestamp'];
         $nonce = $_GET['nonce'];
         $msg_signature = $_GET['msg_signature'];
@@ -85,11 +65,11 @@ class wechatCallback
                     $postStr = $decryptMsg;
                 }
                 else{
-                    //$this->logger(" R \r\n".$errCode);
+                    $this->logger(" R \r\n".$errCode);
                     return;
                 }
 		    }
-		    //$this->logger(" R \r\n".$postStr);
+		    $this->logger(" R \r\n".$postStr);
 		    $postObj = simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
 		    $RX_TYPE = trim($postObj->MsgType);
 
@@ -99,23 +79,24 @@ class wechatCallback
             switch ($RX_TYPE)
             {
                 case "event":
-                    $result = $msgHdl->receiveEvent();
+                    $hdl_result = $msgHdl->receiveEvent();
                     break;
                 case "text":
-                    $result = $msgHdl->receiveText();
+                    $hdl_result = $msgHdl->receiveText();
                     break;
                 default:
+                    $hdl_result = '';
                     break;
             }
-            //$this->logger(" R \r\n".$result);
+            $this->logger(" R \r\n".$result);
             //加密
             if ($encrypt_type == 'aes'){
                 $encryptMsg = ''; //加密后的密文
-                $pc->encryptMsg($result, $timestamp, $nonce, $encryptMsg);
+                $pc->encryptMsg($hdl_result, $timestamp, $nonce, $encryptMsg);
                 $result = $encryptMsg;
-                //$this->logger(" E \r\n".$result);
+                $this->logger(" E \r\n".$result);
             }
-            //echo $result;
+            echo $result;
         }
     }
 
