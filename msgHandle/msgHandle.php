@@ -73,6 +73,7 @@ class msgHandle
         $this->connectDB();
         $this->selectDB();
         $eventKey = trim($this->postObj->EventKey);
+        $result = '';
         switch ($eventKey) {
             case 'viewdb'://查看数据
                 //$sql = "SHOW TABLES FROM eyoungdb ";
@@ -97,14 +98,31 @@ class msgHandle
                 $contentStr = "授权测试".
                     "<a href='https://api.weixin.qq.com/sns/oauth2/access_token?appid=wx03cccee44426ee51&secret=80f8942c040ff31e6f631038b85e7763&code=031727092636d6725cdfc0e74a3f11fn&grant_type=authorization_code'>点击这里获得openid</a>";
                 break;
-            case 'key_bargan'://注册用户
+            case 'key_course':
+                $contentStr = "";
+                $title = "基础美肤";
+                $description = "基础美肤可以帮助您的皮肤保持水润，紧绷，白皙";
+                $picurl = "http://pic1.nipic.com/2009-02-04/200924192933403_2.jpg";
+                $url = "http://www.eyoungbeauty.com/e-young/index.php?r=commodity/courses";
+                $result = $this->sentPicText($contentStr,$title,$description,$picurl,$url);
+                break;
+            case 'key_product':
+                $contentStr = "";
+                $title = "曙红充值卡";
+                $description = "仅需950元就可获得面额为1000元的充值卡";
+                $picurl = "http://mmbiz.qpic.cn/mmbiz/mrVxMwL8DZCCBRKbGHovM0wWKsIjOnA6X6ISvJmRtribFzia1ib4MtIloHqbTXVibXIcAbTbATTku7aqbMuLOjHGIw/0";
+                $url = "http://www.eyoungbeauty.com/e-young/index.php?r=commodity/shop";
+                $result = $this->sentPicText($contentStr,$title,$description,$picurl,$url);
+                break;
+            case 'key_bargain'://注册用户
                 $contentStr = "优惠活动准备中！敬请期待！";
+                $result = $this->sentText($contentStr);
                 break;
             default:
                 $contentStr = "哎呦出错啦！请联系我们！021-XXXXXXXX";
+                $result = $this->sentText($contentStr);
                 break;
         }
-        $result = $this->sentText($contentStr);
         $this->disconnectDB();
         return $result;
     }
@@ -178,6 +196,23 @@ class msgHandle
                                     </xml>";
                         break;
                     case 'CLICK':
+                        $replyTpl = "<xml>
+                                    <ToUserName><![CDATA[%s]]></ToUserName>
+                                    <FromUserName><![CDATA[%s]]></FromUserName>
+                                    <CreateTime>%s</CreateTime>
+                                    <MsgType><![CDATA[%s]]></MsgType>
+                                    <Content><![CDATA[%s]]></Content>
+                                    <ArticleCount>1</ArticleCount>
+                                    <Articles>
+                                        <item>
+                                            <Title><![CDATA[%s]]></Title>
+                                            <Description><![CDATA[%s]]></Description>
+                                            <PicUrl><![CDATA[%s]]></PicUrl>
+                                            <Url><![CDATA[%s]]></Url>
+                                        </item>
+                                    </Articles>
+                                    <FuncFlag>0</FuncFlag>
+                                    </xml>";
                         break;
                     default:
                         break;
